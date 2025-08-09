@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cat Chases Mice — Pixel Runner</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f0;
+    }
+    #gameWrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      height: 100%;
+    }
+    canvas {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column; /* Stack buttons vertically */
+      align-items: center; /* Center align */
+      gap: 12px;
+    }
+    button {
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: #e7e7e7; /* Light gray background */
+      color: #333; /* Dark text */
+      cursor: pointer;
+      transition: background 0.3s;
+      font-size: 16px; /* Increase font size */
+      width: 150px; /* Fixed width for buttons */
+      text-align: center; /* Center text */
+    }
+    button:hover {
+      background: #d0d0d0; /* Darker gray on hover */
+    }
+    .info {
+      font-size: 11px;
+      color: #424242;
+      font-family:'Times New Roman', Times, serif;
+      text-align: center; /* Center align info text */
+    }
+  </style>
+</head>
+<body>
+  <div id="gameWrap">
+    <h2 style="font-size: 24px; color: #333; text-align: center; margin-bottom: 20px;font-family: fantasy;">Cat v/s Mice - Pixel Form</h2>
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <div class="info">(Press <b>Space</b> to pause — Press <b>Enter</b> to STOP / RESTART)</div>
+    </div>
+    <canvas id="c" width="900" height="300"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const roadY = canvas.height * 0.6;
+
+    let running = false;
+    let paused = false;
+    let stopped = false;
+    let elapsedTime = 0; // Timer for paused state
+    let timerInterval; // Interval for updating the timer
+
+    const PIXEL = 4;
+
+    // Cat sprite (10x6)
+    const catSprite = [
+      [0,0,1,1,1,0,0,0,0,0],
+      [0,1,1,1,1,1,0,0,0,0],
+      [1,1,1,1,1,1,1,0,0,0],
+      [1,1,1,1,1,1,1,1,0,0],
+      [0,1,1,1,1,1,1,0,0,0],
+      [0,0,1,1,1,0,0,0,0,0]
+    ];
+
+    // Updated Mouse sprite (8x5)
+    const mouseSprite = [
+      [0,0,1,1,0,0,0,0],
+      [0,1,1,1,1,0,0,0],
+      [1,1,1,1,1,1,1,0],
+      [0,1,1,1,1,0,1,0], // Added tail
+      [0,0,1,1,1,0,0,0]
+    ];
+
+    function drawPixelSprite(ctx, sprite, px, py, scale, color){
+      ctx.fillStyle = color;
+      for(let r=0;r<sprite.length;r++){
+        for(let c=0;c<sprite[r].length;c++){
+          if(sprite[r][c]){
+            ctx.fillRect(px + c*scale, py + r*scale, scale, scale);
+          }
+        }
+      }
+    }
+
+    const cat = {
+      x: 80,
+      y: roadY - (catSprite.length * PIXEL) - 6,
+      width: catSprite[0].length * PIXEL,
+      height: catSprite.length * PIXEL,
+      speed: 1.6,
+      color: '#d86f2a'
+    };
+
+    const mice = [];
+    const mouseSpawnInterval = 900; // ms
+    let lastSpawn = 0;
+
+    function spawnMouse(){
+      const m = {
+        x: canvas.width + 20,
+        y: roadY - (mouseSprite.length * PIXEL) - 6 + (Math.random()*6 - 3),
+        w: mouseSprite[0].length * PIXEL,
+        h: mouseSprite.length * PIXEL,
+        speed: 1 + Math.random() * 1.2
+      };
+      mice.push(m);
+    }
+
+    function drawRoad(){
+      ctx.fillStyle = '#000';
+      const thickness = 6;
+      ctx.fillRect(0, roadY - thickness/2, canvas.width, thickness);
+    }
+
+    function drawCat(){
+      ctx.fillStyle = 'rgba(0,0,0,0.06)';
+      ctx.fillRect(cat.x + 4, cat.y + cat.height - 4, cat.width - 8, 6);
+      drawPixelSprite(ctx, catSprite, Math.round(cat.x), Math.round(cat.y), PIXEL, cat.color);
+    }
+
+    function drawMice(){
+      for(const m of mice){
+        drawPixelSprite(ctx, mouseSprite, Math.round(m.x), Math.round(m.y), PIXEL, '#777');
+      }
+    }
+
+    function update(dt){
+      if(!running || paused || stopped) return;
+      lastSpawn += dt;
+      if(lastSpawn > mouseSpawnInterval){
+        spawnMouse();
+        lastSpawn = 0;
+      }
+
+      for(let i = mice.length -1; i>=0; i--){
+        const m = mice[i];
+        m.x -= m.speed * (dt / 16);
+        if(m.x + m.w < -20) mice.splice(i,1);
+      }
+
+      let target = null;
+      for(const m of mice){
+        if(m.x > cat.x){
+          if(!target || m.x < target.x) target = m;
+        }
+      }
+
+      if(target){
+        const dx = target.x - (cat.x + cat.width);
+        const desired = Math.sign(dx) * Math.min(cat.speed + Math.abs(dx)*0.006, 3.6);
+        cat.x += desired * (dt / 16);
+      } else {
+        cat.x += cat.speed * (dt / 16);
+      }
+
+      for(let i = mice.length -1; i>=0; i--){
+        const m = mice[i];
+        const catFrontX = cat.x + cat.width;
+        if(Math.abs((m.x + m.w/2) - catFrontX) < 10 && Math.abs((m.y + m.h/2) - (cat.y + cat.h/2)) < 16){
+          mice.splice(i,1);
+        }
+      }
+
+      if(cat.x < 6) cat.x = 6;
+      if(cat.x > canvas.width - cat.width - 20) cat.x = canvas.width - cat.width - 20;
+    }
+
+    let lastTime = performance.now();
+    function loop(now){
+      const dt = now - lastTime;
+      lastTime = now;
+      update(dt);
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      drawRoad();
+      drawMice();
+      drawCat();
+
+      ctx.fillStyle = '#222';
+      ctx.font = '13px system-ui';
+      const status = stopped ? 'STOPPED (Enter pressed)' : (paused ? 'PAUSED (Space)' : (running ? 'RUNNING' : 'READY'));
+      ctx.fillText('Status: ' + status, 12, 18);
+      ctx.fillText('Mice on screen: ' + mice.length, 12, 34);
+      ctx.fillText('Elapsed Time: ' + Math.floor(elapsedTime / 1000) + 's', 12, 50); // Display elapsed time
+
+      if(!stopped) requestAnimationFrame(loop);
+    }
+
+    // Controls
+    document.getElementById('startBtn').addEventListener('click', ()=>{
+      if(stopped) {
+        // Restart the game
+        mice.length = 0; 
+        cat.x = 80; 
+        paused = false; 
+        stopped = false; 
+        running = true; 
+        lastSpawn = 0; 
+        elapsedTime = 0; // Reset elapsed time
+        lastTime = performance.now(); 
+        requestAnimationFrame(loop);
+      } else if (!running) {
+        // Start the game
+        running = true; 
+        paused = false; 
+        lastTime = performance.now(); 
+        requestAnimationFrame(loop);
+      }
+    });
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.code === 'Space'){
+        e.preventDefault();
+        if(!running || stopped) return;
+        paused = !paused;
+        if(paused) {
+          // Start the timer when paused
+          timerInterval = setInterval(() => {
+            elapsedTime += 1000; // Increment elapsed time by 1 second
+          }, 1000);
+          // Auto resume after 10 seconds
+          setTimeout(() => {
+            if (paused) {
+              paused = false;
+              clearInterval(timerInterval);
+              lastTime = performance.now();
+              requestAnimationFrame(loop);
+            }
+          }, 10000);
+        } else {
+          clearInterval(timerInterval); // Stop the timer when resuming
+        }
+      }
+      if(e.code === 'Enter'){
+        if(running) {
+          // Stop the game
+          stopped = true; 
+          paused = false; 
+          clearInterval(timerInterval); // Stop the timer on stop
+        } else {
+          // Restart the game
+          mice.length = 0; 
+          cat.x = 80; 
+          paused = false; 
+          stopped = false; 
+          running = true; 
+          lastSpawn = 0; 
+          elapsedTime = 0; // Reset elapsed time
+          lastTime = performance.now(); 
+          requestAnimationFrame(loop);
+        }
+      }
+    });
+
+    window.addEventListener('blur', ()=>{ paused = true; });
+
+    // initial draw
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawRoad();
+    drawCat();
+    ctx.fillStyle = '#222';
+    ctx.font = '13px system-ui';
+    ctx.fillText('Status: READY', 12, 18);
+  </script>
+</body>
+</html>
