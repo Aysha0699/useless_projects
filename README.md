@@ -31,13 +31,20 @@ For Software:
 
 
 # Run
-
+1. Clone this repository
+2. Go to the directory
+3. Click index.html to run the website game.
 
 
 
 # Screenshots (Add at least 3)
+<img width="1760" height="875" alt="Start" src="https://github.com/user-attachments/assets/eb743014-e5fe-4c1a-9f23-123ebae8ad63" /> 
+*This is the initial stage of game before clicking start button*
+<img width="1729" height="869" alt="running" src="https://github.com/user-attachments/assets/ef8ef664-02f3-4c08-bd27-e51be1c2d71e" />
+*This is the running state where the mice blocks the path of cat*
+<img width="1716" height="865" alt="paused" src="https://github.com/user-attachments/assets/bd5f8b7e-c5de-45cc-a5b5-5a66408cfb60" />
+*This is the paused state when the space bar is clicked,the timer runs in the screen*
 
-![Uploading Start.png…]()
 
 
 
@@ -45,16 +52,15 @@ For Software:
 
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
 
-# Additional Demos
-[Add any extra demo materials/links]
+
+https://github.com/user-attachments/assets/ca15e196-7386-46e8-aa9d-660cba698f68
+
+
+*The game starts when clicking on start button.When space bar is clicked the game pauses for 10s and auto resumes,enter key is clicked to restart the game.*
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
+- Aysha henan: Cat v/s mice
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
