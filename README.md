@@ -15,7 +15,7 @@
 [My project is a game in which a  pixel image of cat runs and a bunch of mice blocks it,Space bar is used to pause and it auto-resumes within 10 seconds, enter key is used to stop and restart the game.]
 
 ### The Problem (that doesn't exist)
-[Cat always runs behind mice.Ony dino game is available in offline state]
+[Cat always runs behind mice.Only dino game is available in offline state]
 
 ### The Solution (that nobody asked for)
 [Gave the chance for mice to block cat and when hosted offline, this game can be used as dino game]
