@@ -1,39 +1,32 @@
 <img width="3188" height="1202" alt="frame (3)" src="https://github.com/user-attachments/assets/517ad8e9-ad22-457d-9538-a9e62d137cd7" />
 
 
-# [Project Name] 🎯
+# [CAT V/S MICE] 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: []
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: [Aysha Henan] - [Government Engineering College, Sreekrishnapuram]
 
 ### Project Description
-[2-3 lines about what your project does]
+[My project is a game in which a  pixel image of cat runs and a bunch of mice blocks it,Space bar is used to pause and it auto-resumes within 10 seconds, enter key is used to stop and restart the game.]
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+[Cat always runs behind mice.Ony dino game is available in offline state]
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+[Gave the chance for mice to block cat and when hosted offline, this game can be used as dino game]
 
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+- [HTML]
+- [CSS]
+- [JavaScript]
 
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
 
 ### Implementation
 For Software:
